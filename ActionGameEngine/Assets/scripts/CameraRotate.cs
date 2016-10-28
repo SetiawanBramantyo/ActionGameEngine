@@ -9,7 +9,8 @@ public class CameraRotate : MonoBehaviour
     private float _rotateAngle;
     private float _nextAngle;
     private float _t;
-    private Vector3 _targetPos;
+
+    public Transform _pivotPoint;
 
     void Start()
     {
@@ -20,23 +21,17 @@ public class CameraRotate : MonoBehaviour
         _nextAngle = 0;
         _t = 0;
     }
-	
+
     // Update is called once per frame
     void Update()
     {
+        if ( _pivotPoint == null )
+            return;
+
         if ( !_isMoving )
         {
             if (Input.GetButtonDown("CameraRotate"))
             {
-                Camera camera = GetComponent<Camera>();
-                Vector3 cameraCenter = camera.ScreenToWorldPoint(new Vector3(Screen.width/2, Screen.height/2, camera.nearClipPlane));
-                Vector3 fwd = transform.TransformDirection(Vector3.forward);
-                Vector3 targetLocalPoint = new Vector3();
-                RaycastHit info;
-                if (Physics.Raycast( cameraCenter, fwd, out info ))
-                    targetLocalPoint.z = info.distance;
-            
-                _targetPos = transform.TransformPoint( targetLocalPoint );
                 _startAngle = transform.eulerAngles.y;
                 _rotateAngle = ( 90f * Input.GetAxis("CameraRotate") );
                 _targetAngle = ClampAngle( _startAngle + _rotateAngle );
@@ -52,15 +47,15 @@ public class CameraRotate : MonoBehaviour
             //Debug.Log( string.Format( "target={0},cur={1},dist={3},rot={4},next={2}", _targetAngle, transform.eulerAngles.y, _nextAngle, (transform.eulerAngles.y - _startAngle), _rotateAngle ) );
 
             float angleDiff = _nextAngle - transform.eulerAngles.y;
-            transform.RotateAround(_targetPos, Vector3.up, angleDiff);
 
             if ( _t >= 1
                 || Mathf.Abs( Mathf.DeltaAngle( _startAngle, transform.eulerAngles.y ) ) >= Mathf.Abs( _rotateAngle ) )
             {
                 angleDiff = _targetAngle - transform.eulerAngles.y;
-                transform.RotateAround(_targetPos, Vector3.up, angleDiff);
                 _isMoving = false;
             }
+
+            transform.RotateAround(_pivotPoint.position, Vector3.up, angleDiff);
         }
 
     }

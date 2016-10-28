@@ -16,6 +16,9 @@ public class CameraMove : MonoBehaviour
     {
         float h_translation = Input.GetAxis( "Horizontal" ) * speed * Time.deltaTime;
         float v_translation = Input.GetAxis( "Vertical" ) * speed * Time.deltaTime;
-        transform.Translate( h_translation, v_translation, 0 );
+        float x_translation = h_translation;
+        float z_translation = v_translation/2;
+        float y_translation = v_translation/2;
+        transform.Translate( new Vector3( x_translation, y_translation, z_translation ) );
 	}
 }
